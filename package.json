@@ -1,0 +1,37 @@
+{
+  "name": "dom-middleware",
+  "version": "0.0.0",
+  "description": "Connect/Express middleware that allows you to rewrite text/html using client side techniques",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wballard/dom-middleware.git"
+  },
+  "keywords": [
+    "connect",
+    "express",
+    "middleware",
+    "dom",
+    "jquery",
+    "jsdom"
+  ],
+  "author": "Will Ballard",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/wballard/dom-middleware/issues"
+  },
+  "dependencies": {
+    "jsdom": "~0.8.3",
+    "coffee-script": "~1.6.3"
+  },
+  "devDependencies": {
+    "mocha": "~1.12.0",
+    "chai": "~1.7.2",
+    "request": "~2.27.0",
+    "nodemon": "~0.7.10",
+    "connect": "~2.8.5"
+  }
+}
