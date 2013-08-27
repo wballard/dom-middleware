@@ -1,6 +1,8 @@
 
     mw = require('middlewarify')
     jsdom = require('jsdom')
+    buffer = require('buffer')
+    util = require('util')
 
 This is the DOM injecting middleware. The important points:
 
@@ -16,10 +18,13 @@ This is the DOM injecting middleware. The important points:
 
       middleware = (req, res, next) ->
         intercepting = false
+        contentTypeSet = false
         mw.make res, 'setHeader', res.setHeader
         res.setHeader.use (key, value, next) ->
-          if key.toLowerCase() is 'content-type' and value.toLowerCase().indexOf('text/html') >= 0
-            intercepting = true
+          if key.toLowerCase() is 'content-type' and not contentTypeSet
+            contentTypeSet = true
+            if value.toLowerCase().indexOf('text/html') >= 0
+              intercepting = true
           next()
         body = ''
         write = res.write
@@ -28,24 +33,34 @@ This is the DOM injecting middleware. The important points:
           if not res.headerSent
             res._implicitHeader()
           if intercepting
-            body += chunk
+            if chunk instanceof buffer.Buffer
+              body += chunk.toString(encoding or 'utf8')
+            else
+              body += chunk
           else
             write.call res, chunk, encoding
         res.end = (chunk, encoding) ->
           if chunk
             res.write chunk, encoding
-          document = jsdom.jsdom(body)
-          window = document.createWindow()
-          finish = ->
-            middleware.domEnd(window).done (err) ->
-              if err
-                res.emit 'error', err
-              else
-                end.call res, window.document.innerHTML
-          if middleware.jquery
-            jsdom.jQueryify window, finish
+          if intercepting
+            document = jsdom.env
+              url: req.protocol + '://' + req.headers.host + req.url
+              html: body
+              done: (error, window) ->
+                if error
+                  console.error 'horror shock', error
+                finish = ->
+                  middleware.domEnd(window).done (err) ->
+                    if err
+                      res.emit 'error', err
+                    else
+                      end.call res, window.document.outerHTML
+                if middleware.jquery
+                  jsdom.jQueryify window, finish
+                else
+                  finish()
           else
-            finish()
+            end.call res, null
         next()
 
       middleware.domEnd = (window, next) ->

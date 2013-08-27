@@ -1,6 +1,6 @@
 {
   "name": "dom-middleware",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Connect/Express middleware that allows you to rewrite text/html using client side techniques",
   "main": "index.js",
   "scripts": {
